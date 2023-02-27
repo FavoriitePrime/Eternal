@@ -3,7 +3,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour , IPlayerInput
 {
     [Tooltip("Movement")]
     [SerializeField] private float _speed;
@@ -26,32 +26,34 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        Move();
-        Rotate();
-        Jump();
+        Move(_rigidbody,GetMoveDirection());
+        Rotate(transform, GetMouseInput());
+        Jump(_rigidbody, transform, _jumpForce, GroundCheck());
         Gravity();
     }
-    private void Jump()
+
+    private void Jump(Rigidbody rigidbody, Transform transform, float jumpForce, bool groundCheck)
     {
-        if (Input.GetKeyDown(KeyCode.Space) && GroundCheck())
+        if (Input.GetKeyDown(KeyCode.Space) && groundCheck)
         {
-            _rigidbody.AddForce(transform.up * _jumpForce,ForceMode.Acceleration);
+            rigidbody.AddForce(transform.up * jumpForce,ForceMode.Acceleration);
         }
         else
         {
             return;
         }
     }
-    private void Rotate()
+    private void Rotate(Transform transform, Vector3 mouseInput)
     {
-        transform.rotation *= Quaternion.Euler(GetMouseInput());
+        transform.rotation *= Quaternion.Euler(mouseInput);
     }
-    private void Move()
+    private void Move(Rigidbody rigidbody, Vector3 moveDirection)
     {
-        var direction = GetMoveDirection();
-        direction.y = _rigidbody.velocity.y;
-        _rigidbody.velocity = direction;
+        var direction = moveDirection.normalized;
+        direction.y = rigidbody.velocity.y;
+        rigidbody.velocity = direction;
     }
+
     private void Gravity()
     {
         if(_rigidbody.velocity.y < 0 && !GroundCheck())
@@ -64,7 +66,6 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
     }
-
     private bool GroundCheck()
     {
         if (Physics.OverlapBox(transform.position + _offset, _size, transform.rotation, _layerMask).Length != 0)
@@ -77,19 +78,19 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private Vector3 GetMoveDirection()
+    public Vector3 GetMoveDirection()
     {
-        return (GetVeritcalInput() + GetHorizontalInput()) * _speed;
+        return (GetVeritcalInput(transform) + GetHorizontalInput(transform)) * _speed;
     }
-    private Vector3 GetHorizontalInput()
+    public Vector3 GetHorizontalInput(Transform transform)
     {
         return transform.right * Input.GetAxis("Horizontal");
     }
-    private Vector3 GetVeritcalInput()
+    public Vector3 GetVeritcalInput(Transform transform)
     {
         return transform.forward * Input.GetAxis("Vertical");
     }
-    private Vector3 GetMouseInput()
+    public Vector3 GetMouseInput()
     {
         return new Vector3(0, Input.GetAxis("Mouse X"), 0);
     }
@@ -97,7 +98,7 @@ public class PlayerMovement : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawLine(transform.position, GetHorizontalInput() + GetVeritcalInput() + transform.position);
+        Gizmos.DrawLine(transform.position, GetHorizontalInput(transform) + GetVeritcalInput(transform) + transform.position);
         Gizmos.DrawWireCube(transform.position + _offset, _size);
 
     }
