@@ -22,11 +22,11 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        _playerMovement.Move(_rigidbody, _input.GetMoveDirection(_groundCheck.CheckOnGround()), _groundCheck);
+        _playerMovement.Move(_rigidbody, _input.GetMoveDirection(_groundCheck.CheckOnGround()));
         _playerMovement.Rotate(_rigidbody, _input.GetMouseInput());
     }
     private void FixedUpdate()
     {
-        _playerMovement.Gravity(_rigidbody, _groundCheck.CheckOnGround());
+        _playerMovement.Gravity(_rigidbody, _groundCheck.CheckOnGround(), _groundCheck.CheckMaxJumpHeight());
     }
 }
