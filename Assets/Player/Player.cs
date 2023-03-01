@@ -1,32 +1,29 @@
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerMovement))]
-[RequireComponent(typeof(PlayerInput))]
-[RequireComponent(typeof(GroundCheck))]
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(PlayerMoveDirection))]
+[RequireComponent(typeof (PlayerInput))]
 
 public class Player : MonoBehaviour
 {
     private PlayerMovement _playerMovement;
+    private PlayerMoveDirection _direction;
     private PlayerInput _input;
-    private GroundCheck _groundCheck;
-    private Rigidbody _rigidbody;
 
     private void Start()
     {
         _playerMovement = GetComponent<PlayerMovement>();
+        _direction = GetComponent<PlayerMoveDirection>();
         _input = GetComponent<PlayerInput>();
-        _groundCheck = GetComponent<GroundCheck>(); 
-        _rigidbody = GetComponent<Rigidbody>();
     }
 
     private void Update()
     {
-        _playerMovement.Move(_rigidbody, _input.GetMoveDirection(_groundCheck.CheckOnGround()));
-        _playerMovement.Rotate(_rigidbody, _input.GetMouseInput());
+        _playerMovement.Move(_direction);
+        _playerMovement.Rotate(_input);
     }
     private void FixedUpdate()
     {
-        _playerMovement.Gravity(_rigidbody, _groundCheck.CheckOnGround(), _groundCheck.CheckMaxJumpHeight());
+        _playerMovement.Gravity();
     }
 }

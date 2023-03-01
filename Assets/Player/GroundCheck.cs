@@ -15,35 +15,17 @@ public class GroundCheck : MonoBehaviour
     {
         if (Physics.Raycast(transform.position + _offset, -transform.up * _maxDistance,out hit, _maxDistance, _layerMask))
         {
-            Debug.Log(hit.distance);
-            Debug.Log(hit.distance < _jumpMinHeight);
-            if (hit.distance < _jumpMinHeight)
-            {
-            Debug.Log("OnGround");
-            return true;
-            }
-            else
-            {
-                Debug.Log("not Ground");
-                return false;
-            }
+            return (hit.distance < _jumpMinHeight);
         }
         else
         {
-            Debug.Log("not Ground");
             return false;
         }
     }
+
     public bool CheckMaxJumpHeight()
-    { 
-        if(hit.distance > _jumpMaxHeight)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+    {
+        return (hit.distance > _jumpMaxHeight);
     }
  
     private void OnDrawGizmos()

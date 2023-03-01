@@ -1,6 +1,10 @@
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour 
+
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(GroundCheck))]
+
+public class PlayerMovement : MonoBehaviour ,IMoveabel
 {
     [Header("Movement")]
     [SerializeField] private float _speed;
@@ -8,33 +12,42 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _defualtGravityScale;
     [SerializeField] private float _fallGravityScale;
 
-    public void Rotate(Rigidbody rigidbody, Vector3 mouseInput)
-    {
-        rigidbody.rotation *= Quaternion.Euler(mouseInput);
-    }
-    public void Move(Rigidbody rigidbody, Vector3 moveDirection)
-    {
-        Vector3 direction = new Vector3();
-        moveDirection.Normalize();
-        direction.x = moveDirection.x * _speed;
-        direction.y = rigidbody.velocity.y + (moveDirection.y * _jumpForce);
-        direction.z = moveDirection.z * _speed;
+    private Rigidbody _rigidbody;
+    private GroundCheck _groundCheck;
 
-        rigidbody.velocity = direction;
-    }
-  
-
-    public void Gravity(Rigidbody rigidbody, bool groundCheck, bool maxGroundHeight)
+    private void Start()
     {
-        if(!groundCheck && maxGroundHeight)
+        _groundCheck = GetComponent<GroundCheck>();
+        _rigidbody = GetComponent<Rigidbody>();
+    }
+
+    public void Rotate(PlayerInput input)
+    {
+        _rigidbody.rotation *= Quaternion.Euler(input.GetMouseInput());
+    }
+    public void Move(PlayerMoveDirection input)
+    {
+        Vector3 direction = input.GetMoveDirection(_groundCheck.CheckOnGround());
+        direction.Normalize();
+        direction.x *= _speed;
+        direction.y = _rigidbody.velocity.y + (direction.y * _jumpForce);
+        direction.z *= _speed;
+
+        _rigidbody.velocity = direction;
+    }
+
+   
+    public void Gravity()
+    {
+        if(!_groundCheck.CheckOnGround() && _groundCheck.CheckMaxJumpHeight())
         {
-            Debug.Log("Physics");
-            rigidbody.AddForce(-transform.up * _fallGravityScale, ForceMode.Impulse);
+            _rigidbody.AddForce(-transform.up * _fallGravityScale, ForceMode.Impulse);
         }
         else
         {
-            rigidbody.AddForce(-transform.up * _defualtGravityScale, ForceMode.Impulse);
+            _rigidbody.AddForce(-transform.up * _defualtGravityScale, ForceMode.Impulse);
         }
     }
+
 
 }
