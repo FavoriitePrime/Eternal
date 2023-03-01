@@ -1,29 +1,33 @@
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerMovement))]
-[RequireComponent(typeof(PlayerMoveDirection))]
 [RequireComponent(typeof (PlayerInput))]
 
 public class Player : MonoBehaviour
 {
     private PlayerMovement _playerMovement;
-    private PlayerMoveDirection _direction;
     private PlayerInput _input;
 
     private void Start()
     {
         _playerMovement = GetComponent<PlayerMovement>();
-        _direction = GetComponent<PlayerMoveDirection>();
         _input = GetComponent<PlayerInput>();
     }
 
     private void Update()
     {
-        _playerMovement.Move(_direction);
-        _playerMovement.Rotate(_input);
+        _playerMovement.Move(GetMoveDirection());
+        _playerMovement.Rotate(_input.GetMouseInput());
     }
     private void FixedUpdate()
     {
         _playerMovement.Gravity();
+    }
+
+    public Vector3 GetMoveDirection()
+    {
+        Vector3 direction = _input.GetInput().y * transform.forward + _input.GetInput().x * transform.right;
+        direction.y = _input.GetJumpInput();
+        return direction;
     }
 }
