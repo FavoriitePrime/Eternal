@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(GroundCheck))]
 
-public class PlayerMovement : MonoBehaviour ,IMovabel
+public class PlayerController : MonoBehaviour ,IMovable
 {
     [Header("Movement")]
     [SerializeField] private float _speed;
@@ -25,9 +25,9 @@ public class PlayerMovement : MonoBehaviour ,IMovabel
     {
         _rigidbody.rotation *= Quaternion.Euler(input);
     }
+
     public void Move(Vector3 direction)
     {
-        direction.Normalize();
         direction.x *= _speed;
         direction.z *= _speed;
         direction.y = _rigidbody.velocity.y + (direction.y * _jumpForce);
@@ -45,6 +45,4 @@ public class PlayerMovement : MonoBehaviour ,IMovabel
             _rigidbody.AddForce(-transform.up * _defualtGravityScale, ForceMode.Impulse);
         }
     }
-
-
 }
