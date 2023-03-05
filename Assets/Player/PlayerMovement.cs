@@ -30,24 +30,9 @@ public class PlayerMovement : MonoBehaviour ,IMovabel
         direction.Normalize();
         direction.x *= _speed;
         direction.z *= _speed;
-        direction.y = Jump(direction.y);
+        direction.y = _rigidbody.velocity.y + (direction.y * _jumpForce);
         _rigidbody.velocity = direction;
     }
-
-    public float Jump(float y)
-    {
-        if (_groundCheck.CheckOnGround())
-        {
-            return _rigidbody.velocity.y + (y * _jumpForce);
-        }
-        else
-        {
-            return _rigidbody.velocity.y;
-
-        }
-
-    }
-
 
     public void Gravity()
     {
