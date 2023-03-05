@@ -1,32 +1,45 @@
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerMovement))]
-[RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(PlayerController))]
 [RequireComponent(typeof(GroundCheck))]
 [RequireComponent(typeof(Rigidbody))]
 
 public class Player : MonoBehaviour
 {
-    private PlayerMovement _playerMovement;
-    private PlayerInput _input;
+    private PlayerController _playerMovement;
+    private IPlayerInput _input;
     private GroundCheck _groundCheck;
-    private Rigidbody _rigidbody;
+
+    private Vector3 _moveDirection;
+    private Vector3 _inputRotation;
+    private bool _jumped;
 
     private void Start()
     {
-        _playerMovement = GetComponent<PlayerMovement>();
-        _input = GetComponent<PlayerInput>();
+        _playerMovement = GetComponent<PlayerController>();
+        _input = GetComponent<IPlayerInput>();
         _groundCheck = GetComponent<GroundCheck>(); 
-        _rigidbody = GetComponent<Rigidbody>();
     }
 
     private void Update()
     {
-        _playerMovement.Move(_rigidbody, _input.GetMoveDirection(_groundCheck.CheckOnGround()));
-        _playerMovement.Rotate(_rigidbody, _input.GetMouseInput());
+        var inputMoveDirection = _input.MoveDirection;
+        _moveDirection = transform.forward * inputMoveDirection.y + transform.right * inputMoveDirection.x;
+        _inputRotation = new Vector3(0f, _input.Rotation.x, 0f);
+        _jumped = _input.Jumped;
     }
+
     private void FixedUpdate()
     {
-        _playerMovement.Gravity(_rigidbody, _groundCheck.CheckOnGround(), _groundCheck.CheckMaxJumpHeight());
+        _playerMovement.Move(_moveDirection);
+        _playerMovement.Rotate(_inputRotation);
+
+        var isOnGround = _groundCheck.IsOnGround();
+        var isMaxJumpHeight = _groundCheck.IsMaxJumpHeight();
+        
+        if (_jumped && isOnGround)
+            _playerMovement.Jump();
+        
+        _playerMovement.Gravity(isOnGround, isMaxJumpHeight);
     }
 }

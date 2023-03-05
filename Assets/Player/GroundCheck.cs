@@ -11,7 +11,7 @@ public class GroundCheck : MonoBehaviour
 
     private RaycastHit hit;
 
-    public bool CheckOnGround()
+    public bool IsOnGround()
     {
         if (Physics.Raycast(transform.position + _offset, -transform.up * _maxDistance,out hit, _maxDistance, _layerMask))
         {
@@ -34,7 +34,7 @@ public class GroundCheck : MonoBehaviour
             return false;
         }
     }
-    public bool CheckMaxJumpHeight()
+    public bool IsMaxJumpHeight()
     { 
         if(hit.distance > _jumpMaxHeight)
         {

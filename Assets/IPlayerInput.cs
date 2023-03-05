@@ -4,9 +4,7 @@ using UnityEngine;
 
 public interface IPlayerInput
 {
-    Vector3 GetHorizontalInput(Transform transform);
-
-    Vector3 GetVeritcalInput(Transform transform);
-
-    Vector3 GetMouseInput();
+    Vector2 MoveDirection { get; }
+    Vector2 Rotation { get; }
+    bool Jumped { get; }
 }
