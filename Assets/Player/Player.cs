@@ -1,32 +1,39 @@
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerMovement))]
-[RequireComponent(typeof(PlayerInput))]
-[RequireComponent(typeof(GroundCheck))]
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(PlayerController))]
+[RequireComponent(typeof (PlayerInput))]
 
 public class Player : MonoBehaviour
 {
-    private PlayerMovement _playerMovement;
+    private PlayerController _playerMovement;
     private PlayerInput _input;
-    private GroundCheck _groundCheck;
-    private Rigidbody _rigidbody;
+
+    private Vector3 _moveDirection;
+    private Vector3 _mouseRotation;
 
     private void Start()
     {
-        _playerMovement = GetComponent<PlayerMovement>();
+        _playerMovement = GetComponent<PlayerController>();
         _input = GetComponent<PlayerInput>();
-        _groundCheck = GetComponent<GroundCheck>(); 
-        _rigidbody = GetComponent<Rigidbody>();
     }
 
     private void Update()
     {
-        _playerMovement.Move(_rigidbody, _input.GetMoveDirection(_groundCheck.CheckOnGround()));
-        _playerMovement.Rotate(_rigidbody, _input.GetMouseInput());
+        _mouseRotation = _input.GetMouseInput();
+        _moveDirection = GetMoveDirection();
     }
+
     private void FixedUpdate()
     {
-        _playerMovement.Gravity(_rigidbody, _groundCheck.CheckOnGround(), _groundCheck.CheckMaxJumpHeight());
+        _playerMovement.Move(_moveDirection);
+        _playerMovement.Rotate(_mouseRotation);
+        _playerMovement.Gravity();
+    }
+
+    public Vector3 GetMoveDirection()
+    {
+        Vector3 direction = _input.GetInput().y * transform.forward + _input.GetInput().x * transform.right;
+        direction.y = _input.GetJumpInput();
+        return direction;
     }
 }

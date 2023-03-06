@@ -2,21 +2,13 @@ using UnityEngine;
 
 public class PlayerInput : MonoBehaviour , IPlayerInput
 {
-    public Vector3 GetHorizontalInput(Transform transform)
+    public Vector2 GetInput()
     {
-        return transform.right * Input.GetAxis("Horizontal");
+        return new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
     }
-    public Vector3 GetVeritcalInput(Transform transform)
+    public int GetJumpInput()
     {
-        return transform.forward * Input.GetAxis("Vertical");
-    }
-    public Vector3 GetMouseInput()
-    {
-        return new Vector3(0, Input.GetAxis("Mouse X"), 0);
-    }
-    public int GetJumpInput(bool groundCheck)
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && groundCheck)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             return 1;
         }
@@ -25,17 +17,8 @@ public class PlayerInput : MonoBehaviour , IPlayerInput
             return 0;
         }
     }
-
-    public Vector3 GetMoveDirection(bool groundCheck)
+    public Vector3 GetMouseInput()
     {
-        Vector3 direction = (GetVeritcalInput(transform) + GetHorizontalInput(transform));
-        direction.y = GetJumpInput(groundCheck);
-        return direction;
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(transform.position, GetHorizontalInput(transform) + GetVeritcalInput(transform) + transform.position);
+        return new Vector3(0, Input.GetAxis("Mouse X"), 0);
     }
 }
